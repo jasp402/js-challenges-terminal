@@ -198,3 +198,7 @@ https://blog.carbonfive.com/2015/01/07/vintage-terminal-effect-in-css3/
         opacity: 0;
     }  
 }
+.cmd .emoji, .terminal-output>:not(.raw) .emoji {
+    background-size: contain;
+    background-repeat: no-repeat;
+}

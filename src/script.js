@@ -1,16 +1,24 @@
 $( document ).ready(function() {
     $('.terminal-output > div')[0].remove();
+    $('.twitter.social-icon a')[0].setAttribute('href', 'https://twitter.com/jasp402')
+    title = "___T E R M I N A L____D E____R E T O S___[  J A V A S C R I P T  ]___";
+    position = 0;
+    function scrolltitle() {
+        document.title = title.substring(position, title.length) + title.substring(0, position);
+        position++;
+        if (position > title.length) position = 0;
+        titleScroll = window.setTimeout(scrolltitle,170);
+    }
+    scrolltitle();
 });
 
-var scanlines = $('.scanlines');
-var tv = $('.tv');
-function exit() {
-    $('.tv').addClass('collapse');
-    term.disable();
-}
-var term = $('#term').terminal(function(command, term) {
-    if (command.match(/^\s*exit\s*$/)) {
+let scanlines    = $('.scanlines');
+let tv           = $('.tv');
+let term         = $('#term').terminal(function (command, term) {
+    if (command.match(/^\s*salir\s*$/)) {
         exit();
+    } else if (command.match(/^\s*ayuda\s*$/)) {
+        help();
     } else if (command !== '') {
         try {
             var result = window.eval(command);
@@ -21,40 +29,60 @@ var term = $('#term').terminal(function(command, term) {
             } else if (result !== undefined) {
                 term.echo(new String(result));
             }
-        } catch(e) {
+        } catch (e) {
             term.error(new String(e));
         }
     }
 }, {
-    name: 'js_demo',
-    onResize: set_size,
-    exit: false,
+    name      : 'js_demo',
+    onResize  : set_size,
+    exit      : false,
     // detect iframe codepen preview
-    enabled: $('body').attr('onload') === undefined,
-    onInit: function() {
+    enabled   : $('body').attr('onload') === undefined,
+    onInit    : function () {
         set_size();
-        this.echo('Type [[b;#fff;]exit] to see turn off animation.');
-        this.echo('Type and execute [[b;#fff;]grab()] function to get the scre' +
-                  'enshot from your camera');
-        this.echo('Type [[b;#fff;]camera()] to get video and [[b;#fff;]pause()]/[[b;#fff;]play()] to stop/play');
+        this.echo('Escribe [[b;#fff;]salir] para apagar el sistema.');
+        this.echo('Escribe [[b;#fff;]ayuda] para recibir más información');
     },
-    onClear: function() {
+    onClear   : function () {
         console.log(this.find('video').length);
-        this.find('video').map(function() {
+        this.find('video').map(function () {
             console.log(this.src);
             return this.src;
         });
     },
-    prompt: 'js> '
+    prompt    : 'js> '
 });
-// for codepen preview
-if (!term.enabled()) {
-    term.find('.cursor').addClass('blink');
+let constraints  = {
+    audio: false,
+    video: {
+        width     : {ideal: 1280},
+        height    : {ideal: 1024},
+        facingMode: "environment"
+    }
+};
+let acceptStream = (function () {
+    return 'srcObject' in document.createElement('video');
+})();
+
+async function pictuteInPicture() {
+    var [video] = $('video');
+    try {
+        if (video) {
+            if (video !== document.pictureInPictureElement) {
+                await video.requestPictureInPicture();
+            } else {
+                await document.exitPictureInPicture();
+            }
+        }
+    } catch(error) {
+        term.error(error);
+    }
 }
 function set_size() {
     // for window height of 170 it should be 2s
     var height = $(window).height();
-    var width = $(window).width()
+    var width = $(window).width();
     var time = (height * 2) / 170;
     scanlines[0].style.setProperty("--time", time);
     tv[0].style.setProperty("--width", width);
@@ -63,17 +91,12 @@ function set_size() {
 function tree(obj) {
     term.echo(treeify.asTree(obj, true, true));
 }
-var constraints = {
-    audio: false,
-    video: {
-        width: { ideal: 1280 },
-        height: { ideal: 1024 },
-        facingMode: "environment"
+let play = function() {
+    var video = term.find('video').slice(-1);
+    if (video.length) {
+        video[0].play();
     }
-};
-var acceptStream = (function() {
-    return 'srcObject' in document.createElement('video');
-})();
+}
 function camera() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         term.pause();
@@ -107,12 +130,6 @@ function camera() {
         });
     }
 }
-var play = function() {
-    var video = term.find('video').slice(-1);
-    if (video.length) {
-        video[0].play();
-    }
-}
 function pause() {
     term.find('video').each(function() {
         this.pause(); 
@@ -140,23 +157,23 @@ function grab() {
         });
     }
 }
-async function pictuteInPicture() {
-    var [video] = $('video');
-    try {
-        if (video) {
-            if (video !== document.pictureInPictureElement) {
-                await video.requestPictureInPicture();
-            } else {
-                await document.exitPictureInPicture();
-            }
-        }
-  } catch(error) {
-      term.error(error);
-  }
-}
 function clear() {
     term.clear();
 }
+function exit() {
+    $('.tv').addClass('collapse');
+    term.disable();
+}
+function help() {
+    term.echo([
+        'Escribe [[;#fff;]limpiar] para limpiar la consola.',
+        '\nEscribe [[;#fff;]creditos] para ver los nombres de los desarrolladores.',
+    ].join(''));
+}
 
-github('jcubic/jquery.terminal');
+if (!term.enabled()) {
+    term.find('.cursor').addClass('blink');
+}
+
+github('jasp402/js-challenges-terminal');
 cssVars(); // ponyfill
