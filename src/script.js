@@ -29,7 +29,17 @@ $( document ).ready(function() {
     // $('.twitter.social-icon a')[0].setAttribute('href', 'https://twitter.com/jasp402')
 
 });
-
+let challenges = [{
+    ID       : 1,
+    CHALLENGE: '#1 => MERGE MULTIPLE ARRAYS',
+    SUCCESS  : false
+},
+{
+    ID       : 2,
+    CHALLENGE: '#2 => SUM CONTENT OF AN ARRAY',
+    SUCCESS  : false
+}];
+let activeChallenges = 0;
 let scanlines    = $('.scanlines');
 let tv           = $('.tv');
 let term         = $('#term').terminal(function (command, term) {
@@ -37,14 +47,28 @@ let term         = $('#term').terminal(function (command, term) {
         exit();
     } else if (command.match(/^\s*ayuda\s*$/)) {
         help();
+    } else if(command.match(/^\s*ls\s*$/)){
+        this.set_prompt(`js> `);
+        this.echo(treeify.asTree(challenges, true, true));
+
+    } else if(command.match(/^\s*reto#[0-9]\s*$/)){
+        let arCommand = command.split('#');
+        let id = arCommand[1];
+        activeChallenges = id;
+        let reto = challenges.find(x=>x.ID == id);
+        console.log(reto);
+        this.set_prompt(`(Reto #${id}) js> `);
+        this.echo(treeify.asTree(reto, true, true));
     } else if (command !== '') {
         try {
             var result = window.eval(command);
             if (result && result instanceof $.fn.init) {
                 term.echo('<#jQuery>');
-            } else if (result && typeof result === 'object') {
+            }
+            else if (result && typeof result === 'object') {
                 tree(result);
-            } else if (result !== undefined) {
+            }
+            else if (result !== undefined) {
                 term.echo(new String(result));
             }
         } catch (e) {
