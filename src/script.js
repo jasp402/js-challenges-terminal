@@ -29,6 +29,7 @@ $( document ).ready(function() {
     // $('.twitter.social-icon a')[0].setAttribute('href', 'https://twitter.com/jasp402')
 
 });
+
 let challenges = [{
     ID       : 1,
     CHALLENGE: '#1 => MERGE MULTIPLE ARRAYS',
@@ -42,84 +43,69 @@ let challenges = [{
 let activeChallenges = 0;
 let scanlines    = $('.scanlines');
 let tv           = $('.tv');
-let term         = $('#term').terminal(function (command, term) {
+
+let term = $('#term').terminal(function (command, term) {
     if (command.match(/^\s*salir\s*$/)) {
         exit();
-    } else if (command.match(/^\s*ayuda\s*$/)) {
+    }
+    else if (command.match(/^\s*ayuda\s*$/)) {
         help();
-    } else if(command.match(/^\s*ls\s*$/)){
-        this.set_prompt(`js> `);
-        this.echo(treeify.asTree(challenges, true, true));
-
-    } else if(command.match(/^\s*reto#[0-9]\s*$/)){
-        let arCommand = command.split('#');
-        let id = arCommand[1];
+    }
+    else if (command.match(/^\s*ls\s*$/)) {
+        ls();
+    }
+    else if (command.match(/^\s*clear|limpiar|cls\s*$/)) {
+        clear();
+    }
+    else if (command.match(/^\s*creditos\s*$/)) {
+        credits();
+    }
+    else if (command.match(/^\s*reto#[0-9]\s*$/)) {
+        let arCommand    = command.split('#');
+        let id           = arCommand[1];
         activeChallenges = id;
-        let reto = challenges.find(x=>x.ID == id);
-        console.log(reto);
+        let reto         = challenges.find(x => x.ID == id);
         this.set_prompt(`(Reto #${id}) js> `);
         this.echo(treeify.asTree(reto, true, true));
-    } else if (command !== '') {
-        try {
-            var result = window.eval(command);
-            if (result && result instanceof $.fn.init) {
-                term.echo('<#jQuery>');
-            }
-            else if (result && typeof result === 'object') {
-                tree(result);
-            }
-            else if (result !== undefined) {
-                term.echo(new String(result));
-            }
-        } catch (e) {
-            term.error(new String(e));
+    }
+    else {
+        if (command !== '') {
+            term.error([
+                `"${command}" no se reconoce como un comando interno o externo,\n`,
+                'programa o archivo por lotes ejecutable.'
+            ].join(''));
         }
+
     }
 }, {
-    name      : 'js_demo',
-    onResize  : set_size,
-    exit      : false,
-    // detect iframe codepen preview
-    enabled   : $('body').attr('onload') === undefined,
-    onInit    : function () {
+    name    : 'js_demo',
+    onResize: set_size,
+    exit    : false,
+    enabled : $('body').attr('onload') === undefined,
+    onInit  : function () {
         set_size();
-        this.echo('Escribe [[b;#fff;]salir] para apagar el sistema.');
-        this.echo('Escribe [[b;#fff;]ayuda] para recibir más información');
+        this.echo(['[[;#fff;]Terminal de Retos [JavaScript]] v.0.0.1\n',
+            '(c) 2020 Jasp402 - Developers. Todos los derechos reservados.\n',
+            '\n',
+            'Plataforma educativa, Donde la comunidad de desarrolladores puede resolver desafíos de programación en JavaScript \n',
+            'Escribe [[b;#fff;]ayuda] para recibir más información'].join(''));
     },
-    onClear   : function () {
-        console.log(this.find('video').length);
-        this.find('video').map(function () {
-            console.log(this.src);
-            return this.src;
-        });
-    },
-    prompt    : 'js> '
+    prompt  : 'js> '
 });
-let constraints  = {
-    audio: false,
-    video: {
-        width     : {ideal: 1280},
-        height    : {ideal: 1024},
-        facingMode: "environment"
-    }
-};
-let acceptStream = (function () {
-    return 'srcObject' in document.createElement('video');
-})();
 
-async function pictuteInPicture() {
-    var [video] = $('video');
-    try {
-        if (video) {
-            if (video !== document.pictureInPictureElement) {
-                await video.requestPictureInPicture();
-            } else {
-                await document.exitPictureInPicture();
-            }
-        }
-    } catch(error) {
-        term.error(error);
-    }
+function init(){
+    term.echo(['[[;#fff;]Terminal de Retos [JavaScript]] v.0.0.1\n',
+        '(c) 2020 Jasp402 - Developers. Todos los derechos reservados.\n',
+        '\n',
+        'Plataforma educativa, Donde la comunidad de desarrolladores puede resolver desafíos de programación en JavaScript \n',
+        'Escribe [[b;#fff;]ayuda] para recibir más información'].join(''));
+}
+function credits() {
+    term.echo([
+        'Developers:',
+        '[[;#fff;]Jasp402] (Jesus perez)\n',
+        'Colaboladores: \n',
+    ].join(''));
 }
 function set_size() {
     // for window height of 170 it should be 2s
@@ -133,13 +119,103 @@ function set_size() {
 function tree(obj) {
     term.echo(treeify.asTree(obj, true, true));
 }
-let play = function() {
+function ls() {
+    term.set_prompt(`js> `);
+    term.echo(treeify.asTree(challenges, true, true));
+}
+function clear() {
+    term.clear();
+    init();
+}
+function exit() {
+    $('.tv').addClass('collapse');
+    term.disable();
+}
+function help() {
+    clear();
+    term.echo([
+        '[[;#fff;]limpiar]  \t Para limpiar la consola. \n',
+        '[[;#fff;]ls]       \t Para listar los retos \n',
+        '[[;#fff;]reto#]    \t Para ingresar a un desafio, debe colocar el numero del reto a resolver. Ejemplo: [[;#fff;]reto#1] \n',
+        '[[;#fff;]creditos] \t para ver los nombres de los desarrolladores.',
+    ].join(''));
+}
+
+var github = function(repo) {
+    var a = document.createElement('a');
+    a.target = '_top';
+    a.setAttribute('class', 'github');
+    a.href = 'https://github.com/' + repo;
+    a.innerHTML = '<img style="position: fixed; top: 0; right: 0; border: 0; cursor: pointer;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"/>';
+    document.addEventListener("DOMContentLoaded",
+        function() {
+            document.body.appendChild(a);
+        });
+};
+
+if (!term.enabled()) {
+    term.find('.cursor').addClass('blink');
+}
+
+github('jasp402/js-challenges-terminal');
+cssVars(); // ponyfill
+
+/**
+ * Old functions - No use!
+ else if (command !== '') {
+        try {
+            var result = window.eval(command);
+            console.log(result)
+        //     if (result && result instanceof $.fn.init) {
+        //         term.echo('<#jQuery>');
+        //     }
+        //     else if (result && typeof result === 'object') {
+        //         tree(result);
+        //     }
+        //     else if (result !== undefined) {
+        //         term.echo(new String(result));
+        //     }
+        } catch (e) {
+            term.error(new String(e));
+        }
+    }
+ let constraints  = {
+    audio: false,
+    video: {
+        width     : {ideal: 1280},
+        height    : {ideal: 1024},
+        facingMode: "environment"
+    }
+};
+ function grab() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        term.pause();
+        var media = navigator.mediaDevices.getUserMedia(constraints);
+        media.then(function(mediaStream) {
+            const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+            const imageCapture = new ImageCapture(mediaStreamTrack);
+            return imageCapture.takePhoto();
+        }).then(function(blob) {
+            term.echo('<img src="' + URL.createObjectURL(blob) + '" class="self"/>', {
+                raw: true,
+                finialize: function(div) {
+                    div.find('img').on('load', function() {
+                        URL.revokeObjectURL(this.src);
+                    });
+                }
+            }).resume();
+        }).catch(function(error) {
+            term.error('Device Media Error: ' + error);
+        });
+    }
+}
+ let play = function() {
     var video = term.find('video').slice(-1);
     if (video.length) {
         video[0].play();
     }
 }
-function camera() {
+ function camera() {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         term.pause();
         var media = navigator.mediaDevices.getUserMedia(constraints);
@@ -172,61 +248,26 @@ function camera() {
         });
     }
 }
-function pause() {
+ function pause() {
     term.find('video').each(function() {
-        this.pause(); 
+        this.pause();
     });
 }
-function grab() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        term.pause();
-        var media = navigator.mediaDevices.getUserMedia(constraints);
-        media.then(function(mediaStream) {
-            const mediaStreamTrack = mediaStream.getVideoTracks()[0];
-            const imageCapture = new ImageCapture(mediaStreamTrack);
-            return imageCapture.takePhoto();
-        }).then(function(blob) {
-            term.echo('<img src="' + URL.createObjectURL(blob) + '" class="self"/>', {
-                raw: true,
-                finialize: function(div) {
-                    div.find('img').on('load', function() {
-                        URL.revokeObjectURL(this.src);
-                    });
-                }
-            }).resume();
-        }).catch(function(error) {
-            term.error('Device Media Error: ' + error);
-        });
+ let acceptStream = (function () {
+    return 'srcObject' in document.createElement('video');
+})();
+ async function pictuteInPicture() {
+    var [video] = $('video');
+    try {
+        if (video) {
+            if (video !== document.pictureInPictureElement) {
+                await video.requestPictureInPicture();
+            } else {
+                await document.exitPictureInPicture();
+            }
+        }
+    } catch(error) {
+        term.error(error);
     }
 }
-function clear() {
-    term.clear();
-}
-function exit() {
-    $('.tv').addClass('collapse');
-    term.disable();
-}
-function help() {
-    term.echo([
-        'Escribe [[;#fff;]limpiar] para limpiar la consola.',
-        '\nEscribe [[;#fff;]creditos] para ver los nombres de los desarrolladores.',
-    ].join(''));
-}
-var github = function(repo) {
-    var a = document.createElement('a');
-    a.target = '_top';
-    a.setAttribute('class', 'github');
-    a.href = 'https://github.com/' + repo;
-    a.innerHTML = '<img style="position: fixed; top: 0; right: 0; border: 0; cursor: pointer;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"/>';
-    document.addEventListener("DOMContentLoaded",
-        function() {
-            document.body.appendChild(a);
-        });
-};
-
-if (!term.enabled()) {
-    term.find('.cursor').addClass('blink');
-}
-
-github('jasp402/js-challenges-terminal');
-cssVars(); // ponyfill
+ */
