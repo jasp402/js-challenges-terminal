@@ -1,3 +1,0 @@
-# JS - Challenges >_ Terminal
-
-
