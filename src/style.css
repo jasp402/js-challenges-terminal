@@ -5,10 +5,9 @@
 body {
     margin: 0;
     background: black;
-    font-family: 'Roboto', sans-serif !important;
 }
 #term {
-    height: 100vh;
+    height: 100%;
 }
 :root {
     --background: #031e11;
@@ -99,6 +98,7 @@ body {
 /* glow */
 .terminal {
     text-shadow: 0 0.2rem 1rem #0c7b46;
+    --font: 'Share Tech Mono';
 }
 /* based on
 https://blog.carbonfive.com/2015/01/07/vintage-terminal-effect-in-css3/

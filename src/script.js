@@ -122,14 +122,31 @@ let scanlines        = $('.scanlines');
 let tv               = $('.tv');
 let countdown;
 let countdownActive  = false;
-let initText = ['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.1\n',
+let initText = ['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.2\n',
     '(c) 2023 Jasp402 - Developers. Todos los derechos reservados.\n',
     '_____________________________________________________________\n',
     'RETOS-JS: Desata tu talento en JavaScript con nuestro emocionante juego retro interactivo.\n',
     'Supera desafíos de programación en estilo arcade y ¡atrévete a llegar más lejos!\n',
     '\n'].join('');
+let areYouDead = '[[b;#f00;]                                                  \n' +
+    '               &&&&& ....,,,,,,&&&&&              \n' +
+    '           .&&&.     .....,,,,,,,,,,&&&           \n' +
+    '        &&&&.   ..............,,,,,,,,,&&&&       \n' +
+    '       &.... .................,,,,,,,,,,,,,&      \n' +
+    '       &..   ..................,,,,,,,,,,,,&&&    \n' +
+    '     &&.  .....................,,,,,,,,,,,,,&&    \n' +
+    '     &&......&&&&&&&&&&.....&&&&&&&&&&,,,,,,&&    \n' +
+    '     &&.....&&&&&&&&&&&&&.&&&&&&&&&&&&&,,,,,&&    \n' +
+    '       &....&&&&&&&&&&&.....&&&&&&&&&&&,,,,&      \n' +
+    '       &.....&&&&&&&&.........&&&&&&&&,,,,,&      \n' +
+    '        &&&&...........&&&&&...,,,,,,,,&&&&       \n' +
+    '          &&&..........&&&&&..,,,,,,,,&&&         \n' +
+    '               &&&..........,,,,,&&&              \n' +
+    '                @&,,.,,..,..,,,,,&(               \n' +
+    '                @&,,.,,..,..,,,,,&(               \n' +
+    '                                                  ]';
 
-let textCountDown = ['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.1\n',
+let textCountDown = ['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.2\n',
     '(c) 2023 Jasp402 - Developers. Todos los derechos reservados.\n',
     '_____________________________________________________________\n',
     'RETOS-JS: Desata tu talento en JavaScript con nuestro emocionante juego retro interactivo.\n',
@@ -160,9 +177,9 @@ let term = $('#term').terminal(function (command, term) {
     else if (command.match(/^\s*ayuda\s*$/)) {
         help();
     }
-    else if (command.match(/^\s*ls\s*$/)) {
-        ls();
-    }
+    // else if (command.match(/^\s*ls\s*$/)) {
+    //     ls();
+    // }
     else if (command.match(/^\s*clear|limpiar|cls\s*$/)) {
         clear();
     }
@@ -217,7 +234,7 @@ let term = $('#term').terminal(function (command, term) {
     enabled : $('body').attr('onload') === undefined,
     onInit  : function () {
         set_size();
-        this.echo(['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.1\n',
+        this.echo(['[[;#fff;]Terminal de Retos [JavaScript]] v.1.0.2\n',
             '(c) 2023 Jasp402 - Developers. Todos los derechos reservados.\n',
             '_____________________________________________________________\n',
             '[[b;#fff;]RETOS-JS] es un juego interactivo en la web, con un estilo retro, que desafía a los\n' +
@@ -299,7 +316,7 @@ function mostrarReto(id) {
     let reto = challenges.find(x => x.ID == id);
     let maxLetters = reto.CHALLENGE.length <= 150 ? (reto.CHALLENGE.length + 4) : 150;
     console.log(maxLetters);
-    let frames = '#'.repeat(maxLetters);
+    let frames = '-'.repeat(maxLetters);
     term.echo(frames);
     term.echo(reto.CHALLENGE);
     term.echo(frames);
@@ -312,9 +329,11 @@ function mostrarReto(id) {
 }
 
 function startCountdown() {
-    let minutes     = 5;
+    let minutes     = 1;
     let seconds     = 0;
     countdownActive = true;
+    let arEndMessage = ["¡FIN DEL TIEMPO!","¡TIEMPO ESTA AGOTADO!","¡SE ACABÓ EL TIEMPO!","¡EL RELOJ MARCA CERO!","¡LA CUENTA ATRÁS TERMINÓ!","¡TIEMPO CUMPLIDO!","¡EL TIEMPO HA EXPIRADO!"]
+    let endMessage  = Math.floor(Math.random() * 7) + 1 <= 7 ? arEndMessage[Math.floor(Math.random() * 7)] : arEndMessage[0];
 
     countdown = setInterval(function () {
         let countdownString = `${textCountDown}\n[[;#fff;]¡TU DESAFIO HA COMENZADO!]: Tienes [[;#fff;]${minutes}:${seconds < 10 ? '0' + seconds : seconds}] para resolver el mayor numero de retos posibles.\n`;
@@ -327,7 +346,8 @@ function startCountdown() {
         if (minutes < 0) {
             clearInterval(countdown);
             countdownActive = false;
-            term.update(0, countdownString);
+            clear();
+            term.update(0, `${areYouDead}\n              [[;#fff;]${endMessage}]`);
             term.set_prompt("js> ");
         }
     }, 1000);
