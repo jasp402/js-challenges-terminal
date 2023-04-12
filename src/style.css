@@ -1,9 +1,11 @@
 /*
  * part of the style based on http://js13kgames.com/entries/lost-in-cyberspace
  */
+
 body {
     margin: 0;
     background: black;
+    font-family: 'Roboto', sans-serif !important;
 }
 #term {
     height: 100vh;
@@ -196,7 +198,7 @@ https://blog.carbonfive.com/2015/01/07/vintage-terminal-effect-in-css3/
     100% {
         transform: scaleX(calc(1 / var(--width))) scaleY(calc(1 / var(--height)));
         opacity: 0;
-    }  
+    }
 }
 .cmd .emoji, .terminal-output>:not(.raw) .emoji {
     background-size: contain;
